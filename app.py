@@ -118,9 +118,9 @@ def analyze():
     except anthropic.APIConnectionError:
         app.logger.exception("APIConnectionError の詳細")
         return jsonify({"error": "AIサーバーへの接続に失敗しました。もう一度お試しください。"}), 502
-    except anthropic.APIError as e:
+    except anthropic.APIError:
         app.logger.exception("APIError の詳細")
-        return jsonify({"error": f"AI呼び出しでエラーが発生しました: {e}"}), 502
+        return jsonify({"error": "AI呼び出しでエラーが発生しました。もう一度お試しください。"}), 502
 
     text = next((b.text for b in response.content if b.type == "text"), None)
     if not text:
