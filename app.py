@@ -103,6 +103,10 @@ def analyze():
         )
     except anthropic.APIStatusError as e:
         return jsonify({"error": f"AI呼び出しでエラーが発生しました: {e.message}"}), 502
+    except anthropic.APIConnectionError:
+        return jsonify({"error": "AIサーバーへの接続に失敗しました。もう一度お試しください。"}), 502
+    except anthropic.APIError as e:
+        return jsonify({"error": f"AI呼び出しでエラーが発生しました: {e}"}), 502
 
     text = next((b.text for b in response.content if b.type == "text"), None)
     if not text:
@@ -115,6 +119,11 @@ def analyze():
 
     result["image_url"] = f"/uploads/{saved_name}"
     return jsonify(result)
+
+
+@app.errorhandler(500)
+def handle_internal_error(e):
+    return jsonify({"error": "サーバーで予期しないエラーが発生しました。もう一度お試しください。"}), 500
 
 
 @app.route("/uploads/<path:filename>")
