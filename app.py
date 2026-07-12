@@ -115,10 +115,9 @@ def analyze():
         )
     except anthropic.APIStatusError as e:
         return jsonify({"error": f"AI呼び出しでエラーが発生しました: {e.message}"}), 502
-    except anthropic.APIConnectionError as e:
+    except anthropic.APIConnectionError:
         app.logger.exception("APIConnectionError の詳細")
-        cause = repr(e.__cause__) if e.__cause__ else "原因不明"
-        return jsonify({"error": f"AIサーバーへの接続に失敗しました: {cause}"}), 502
+        return jsonify({"error": "AIサーバーへの接続に失敗しました。もう一度お試しください。"}), 502
     except anthropic.APIError as e:
         app.logger.exception("APIError の詳細")
         return jsonify({"error": f"AI呼び出しでエラーが発生しました: {e}"}), 502
